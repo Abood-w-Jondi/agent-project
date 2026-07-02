@@ -89,6 +89,8 @@ the last message should always be a text message, and should not be a function c
     
         message = response.choices[0].message
         if message.tool_calls:
+            #append the tool call to the history, so the agent rememberes what he asked for, and not just the results
+            messages.append(message)
             for tool_call in message.tool_calls:
                 result_message = call_function(tool_call, args.verbose)
                 if not result_message["content"]:
@@ -99,7 +101,7 @@ the last message should always be a text message, and should not be a function c
         else:
             print(message.content)
             messages.append({"role": message.role, "content": message.content})
-            end_tokenfound = message.content.strip().endswith("<task-completed value=\"true\">")
+            end_tokenfound = "<task-completed value=\"true\">" in message.content #a little improvment to reduce the app missing it in case the agent added a white space, or the model hulucinates
     print(f"Total loops: {currant_loop}")
 
 
